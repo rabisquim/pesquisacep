@@ -21,30 +21,32 @@ public class ListaEnderecos {
 
     }
 
-    public void adicionarEndereco() throws IOException {
+    public void adicionarEndereco() {
         System.out.println("Informe o CEP para busca: ");
         String cep = scanner.nextLine();
-        String enderecoJson = Api.getEnderecoPesquisa(cep);
 
-        try {
-            Gson gson = new Gson();
-            Endereco endereco = gson.fromJson(enderecoJson, Endereco.class);
+        if (!cep.isEmpty() && cep.matches("\\d{8}")) {
+            try {
+                String enderecoJson = Api.getEnderecoPesquisa(cep);
+                Gson gson = new Gson();
+                Endereco endereco = gson.fromJson(enderecoJson, Endereco.class);
 
-            if (endereco.getComplemento() == null || endereco.getComplemento().isEmpty()) {
-                endereco.setComplemento("Vazio");
+                if (endereco.getComplemento() == null || endereco.getComplemento().isEmpty()) {
+                    endereco.setComplemento("Vazio");
+                }
+
+                enderecos.add(endereco);
+
+                System.out.println("Endereço adicionado com sucesso: ");
+                System.out.println(endereco);
+            } catch (IOException e) {
+                System.out.println("Erro na consulta do endereço: " + e.getMessage());
+            } catch (JsonSyntaxException e) {
+                System.out.println("Erro na conversão do JSON: " + e.getMessage());
             }
-
-            enderecos.add(endereco);
-
-            System.out.println("Endereço adicionado com sucesso: ");
-            System.out.println(endereco);
-
-
-        } catch (JsonSyntaxException e) {
-            System.out.println("Erro na conversão do JSON");
-            System.out.println(e.getMessage());
+        } else {
+            System.out.println("CEP inválido. Tente novamente.");
         }
-
     }
     public void listarEnderecos() {
         System.out.println ("Lista de endereços: ");
